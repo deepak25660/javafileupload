@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Upload and Crop</title>
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.min.css">
+</head>
+<body>
+    <h1>Image Upload and Crop</h1>
+    <form action="#" th:action="@{/upload}" th:object="${croppedData}" method="post" enctype="multipart/form-data">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="file">Select Image:</label>
+        <input type="file" id="file" name="file" required>
+        <br>
+        <div>
+            <img id="imagePreview" th:src="${croppedData.imageData}">
+        </div>
+        <br>
+        <input type="hidden" id="x" name="x" th:value="${croppedData.x}">
+        <input type="hidden" id="y" name="y" th:value="${croppedData.y}">
+        <input type="hidden" id="width" name="width" th:value="${croppedData.width}">
+        <input type="hidden" id="height" name="height" th:value="${croppedData.height}">
+        <input type="hidden" id="rotate" name="rotate" th:value="${croppedData.rotate}">
+        <button type="submit">Upload and Crop</button>
+        <button type="button" onclick="rotateImage()"id="rotate" name="rotate" th:value="${croppedData.rotate}">Rotate Image</button>
+    </form>
+    <script src="https://unpkg.com/cropperjs/dist/cropper.min.js"></script>
+    <script th:inline="javascript">
+        var image = document.getElementById('imagePreview');
+        var cropper;
+
+        document.getElementById('file').addEventListener('change', function (e) {
+            var file = e.target.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function (event) {
+                image.src = event.target.result;
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    movable: false,
+                    rotatable: true,
+                    scalable: false,
+                    zoomable: false,
+                    cropBoxResizable: true,
+                    crop: function (e) {
+                        document.getElementById('x').value = e.detail.x;
+                        document.getElementById('y').value = e.detail.y;
+                        document.getElementById('width').value = e.detail.width;
+                        document.getElementById('height').value = e.detail.height;
+                        document.getElementById('rotate').value = e.detail.rotate;
+                    }
+                });
+            };
+
+            reader.readAsDataURL(file);
+        });
+        function rotateImage() {
+            if (cropper) {
+                cropper.rotate(90);
+            }
+        }
+    </script>
+</body>
+</html>
